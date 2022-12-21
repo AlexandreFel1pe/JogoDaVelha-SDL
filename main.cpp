@@ -8,11 +8,13 @@
 #include "class.h"
 #include "mecanics.h"
 #include "render.h"
+#include <ctime>
 
 using namespace std;
 
 void menu();
-void game();
+void gameContraJogador();
+void gameContraMaquina();
 void inittabuleiro();
 void reset();
 char SDLQuit();
@@ -43,7 +45,8 @@ int main(){
     printf("%c", SDLQuit());
 }
 
-void game(){
+void gameContraMaquina(){
+    ta = false;
     local = 1;
     reset();
     inittabuleiro();
@@ -59,7 +62,50 @@ void game(){
             if(e.type == SDL_MOUSEBUTTONDOWN){
                 x = e.button.x;
                 y = e.button.y;
-                jogada();
+                moveX();
+                moveO();
+            }
+            if(verificavitoria() == 1){
+                menurender = 'x';
+                menu();
+                quit = true;
+            }
+            if(verificavitoria() == 2){
+                menurender = 'o';
+                menu();
+                quit = true;
+            }
+            if(cont == 9){
+                menurender = 'e';
+                menu();
+                quit = true;
+            }
+        }
+        SDL_RenderClear(renderer);
+        SDL_RenderCopy(renderer, imgtabuleiro.getEntity(), NULL, NULL);
+        renderX(renderer, imgx.getEntity());
+        renderbolinha(renderer,imgbolinha.getEntity());
+        SDL_RenderPresent(renderer);
+    }
+}
+
+void gameContraJogador(){
+    local = 1;
+    reset();
+    inittabuleiro();
+    cont = 0;
+
+    SDL_Event e;
+    bool quit = false;
+    while(!quit){
+        while(SDL_PollEvent(&e)){
+            if(e.type == SDL_QUIT){
+                quit = true;
+            }
+            if(e.type == SDL_MOUSEBUTTONDOWN){
+                x = e.button.x;
+                y = e.button.y;
+                jogadorContraJogador();
             }
             if(verificavitoria() == 1){
                 menurender = 'x';
@@ -86,6 +132,7 @@ void game(){
 }
 
 void menu(){ 
+    cont = 0;
     std::string pontos = " ";
     string stringPontosX = "Pontos X:";
     string stringPontosO = " Pontos O:";
@@ -123,9 +170,13 @@ void menu(){
             if(e.type == SDL_MOUSEBUTTONDOWN){
                 x = e.button.x;
                 y = e.button.y;
-                if((x > 220 && x < 395) && (y > 245 && y < 315)){
+                if((x > 140 && x < 490) && (y > 222 && y < 279)){
                     quit = true;
-                    game();
+                    gameContraMaquina();
+                }
+                if((x > 140 && x < 490) && (y > 305 && y < 362)){
+                    quit = true;
+                    gameContraJogador();
                 }
             }
         }
